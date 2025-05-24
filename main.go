@@ -53,7 +53,7 @@ func main() {
 	logger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 	logger.Info("hofweb checker started")
 
-	ticker := time.NewTicker(20 * time.Second)
+	ticker := time.NewTicker(5 * time.Minute)
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM)
 	existingProds := make([]string, 0)
