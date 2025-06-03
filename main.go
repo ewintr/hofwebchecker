@@ -27,6 +27,7 @@ var (
 	mailUser     = flag.String("mail-user", "user@example.com", "login user")
 	mailPassword = flag.String("mail-password", "secret", "login password")
 	mailTo       = flag.String("mail-to", "to@example.com", "to address")
+	mailCC       = flag.String("mail-cc", "cc@example.com", "cc address")
 	mailFrom     = flag.String("mail-from", "from@example.com", "from address")
 )
 
@@ -36,6 +37,7 @@ type MailConfiguration struct {
 	User     string
 	Password string
 	To       string
+	CC       string
 	From     string
 }
 
@@ -47,6 +49,7 @@ func main() {
 		User:     *mailUser,
 		Password: *mailPassword,
 		To:       *mailTo,
+		CC:       *mailCC,
 		From:     *mailFrom,
 	}
 
@@ -114,7 +117,6 @@ func Check() ([]Product, error) {
 	); err != nil {
 		return nil, err
 	}
-	//	fmt.Println(res)
 
 	products := make([]Product, 0)
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(res))
@@ -127,7 +129,6 @@ func Check() ([]Product, error) {
 		if !ok {
 			url = "not found"
 		}
-		// fmt.Printf("%s - %s\n", name, url)
 		products = append(products, Product{
 			Name: name,
 			URL:  url,
@@ -152,6 +153,7 @@ func Notify(conf MailConfiguration, prods []Product) error {
 	m := gomail.NewMessage()
 	m.SetHeader("From", conf.From)
 	m.SetHeader("To", conf.To)
+	m.SetHeader("Cc", conf.CC)
 	m.SetHeader("Subject", "Nieuwe 2e klas groentes beschikbaar op hofweb.nl")
 	m.SetBody("text/html", html)
 
