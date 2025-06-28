@@ -80,7 +80,6 @@ func main() {
 			logger.Info("fetched products", "total", len(currentProducts), "new", len(newProducts))
 
 			if len(existingProds) != 0 && len(newProducts) > 0 {
-				// if len(newProducts) > 0 {
 				if err := Notify(mailConf, newProducts); err != nil {
 					logger.Error("could not notify of new products", "error", err)
 					continue
@@ -106,11 +105,13 @@ type Product struct {
 }
 
 func Check() ([]Product, error) {
-	ctx, cancel := chromedp.NewContext(context.Background())
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
 	defer cancel()
+	cdpctx, cdpcancel := chromedp.NewContext(ctx)
+	defer cdpcancel()
 
 	var res string
-	if err := chromedp.Run(ctx,
+	if err := chromedp.Run(cdpctx,
 		chromedp.Navigate(URL),
 		chromedp.WaitReady(`.info-container-wrapper  .name `),
 		chromedp.InnerHTML(`.category--products-wrapper`, &res, chromedp.ByQueryAll),
@@ -135,6 +136,10 @@ func Check() ([]Product, error) {
 		})
 
 	})
+
+	// tctx, tcancel := context.WithTimeout(cdpctx, 10*time.Second)
+	// defer tcancel()
+	// chromedp.Cancel(tctx)
 
 	return products, nil
 }
