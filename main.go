@@ -125,6 +125,7 @@ func main() {
 				"last_check_end": time.Now().Format(time.RFC3339),
 				"friendly_name":  "Hofweb checker",
 				"icon":           "mdi:power",
+				"count":          len(existingProds),
 			}); err != nil {
 				logger.Error("failed to update homeassistant", "error", err)
 			}
